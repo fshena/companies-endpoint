@@ -1,0 +1,410 @@
+openapi: 3.0.0
+
+info:
+  title: Companies Endpoint
+  version: 1.0.0
+  description: API endpoint for the companies
+
+servers:
+- url: 'http://api.localleague.local:3000'
+  description: Local development server
+- url: 'http://api.localleague.local:3000'
+  description: Production server
+
+security:
+- BearerAuth: []
+
+paths:
+  /companies:
+    get:
+      tags:
+      - Companies
+      summary: Get companies list
+      description: Get a paginated list of companies
+      operationId: getCompanies
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          default: 100
+          maximum: 100
+        required: false
+        description: The number of results returned in the response
+      - in: query
+        name: fields
+        schema:
+          type: string
+          enum:
+          - id
+          - name
+          - description
+          - telephone
+          - email
+          - logo
+          - latitude
+          - longitude
+          - street
+          - number
+          - city
+          - country
+          - is_active
+        required: false
+        description: A comma separated list of the company's fields to be returned in the response
+      - in: query
+        name: order
+        schema:
+          type: string
+          default: asc
+          enum:
+          - asc
+          - desc
+        required: false
+        description: The order of the returned results
+      - in: query
+        name: sort
+        schema:
+          type: string
+          default: email
+          enum:
+          - id
+          - name
+          - email
+          - city
+          - country
+          - is_active
+        required: false
+        description: Sort results by specific company field
+      responses:
+        '200':
+          description: A full list of companies
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Rate:
+              $ref: '#/components/headers/X-RateLimit-Rate'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Company'
+        '400':
+          $ref: '#/components/responses/BAD_REQUEST'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN'
+    post:
+      tags:
+        - Companies
+      summary: Create company
+      description: Create a new company
+      operationId: postCompany
+      requestBody:
+        description: An object containing the company's data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Company'
+      responses:
+        '201':
+          description: Company succesfully created
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Rate:
+              $ref: '#/components/headers/X-RateLimit-Rate'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            Content-Location:
+              $ref: '#/components/headers/Content-Location'
+        '400':
+          $ref: '#/components/responses/BAD_REQUEST'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN'
+        '422':
+          $ref: '#/components/responses/UNPROCESSABLE_ENTITY'
+  /companies/{companyId}:
+    get:
+      tags:
+      - Companies
+      summary: Get a specific company
+      description: Get data for a specific company
+      operationId: getCompaniesById
+      parameters:
+      - in: path
+        name: companyId
+        required: true
+        schema:
+          type: number
+        description: Company ID
+      - in: query
+        name: fields
+        schema:
+          type: string
+          enum:
+          - id
+          - name
+          - description
+          - telephone
+          - email
+          - logo
+          - latitude
+          - longitude
+          - street
+          - number
+          - city
+          - country
+          - is_active
+        required: false
+        description: A comma separated list of the company's fields to be returned in the response
+      responses:
+        '200':
+          description: A company object
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Rate:
+              $ref: '#/components/headers/X-RateLimit-Rate'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+        '400':
+          $ref: '#/components/responses/BAD_REQUEST'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN'
+        '404':
+          $ref: '#/components/responses/NOT_FOUND'
+    put:
+      tags:
+        - Companies
+      summary: Update company
+      description: Replace existing company's data
+      operationId: putCompany
+      parameters:
+      - in: path
+        name: companyId
+        required: true
+        schema:
+          type: number
+        description: Company ID
+      requestBody:
+        description: An object containing the new company data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Company'
+      responses:
+        '204':
+          description: Company successfully updated
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Rate:
+              $ref: '#/components/headers/X-RateLimit-Rate'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+        '400':
+          $ref: '#/components/responses/BAD_REQUEST'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN'
+        '404':
+          $ref: '#/components/responses/NOT_FOUND'
+        '422':
+          $ref: '#/components/responses/UNPROCESSABLE_ENTITY'
+    delete:
+      tags:
+        - Companies
+      summary: Delete company
+      description: Delete existing company
+      operationId: deleteCompany
+      parameters:
+      - in: path
+        name: companyId
+        required: true
+        schema:
+          type: number
+        description: Company ID
+      responses:
+        '204':
+          description: Company successfully deleted
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Rate:
+              $ref: '#/components/headers/X-RateLimit-Rate'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+        '400':
+          $ref: '#/components/responses/BAD_REQUEST'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN'
+        '404':
+          $ref: '#/components/responses/NOT_FOUND'
+        '422':
+          $ref: '#/components/responses/UNPROCESSABLE_ENTITY'
+
+components:
+  schemas:
+    Company:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The company identifier
+          example: 123
+        name:
+          type: string
+          pattern: '^[a-zA-Z0-9-_ ]+$'
+          minLength: 3
+          maxLength: 100
+          description: The company name.
+          example: 'Gipeda 5x5'
+        description:
+          type: string
+          minLength: 3
+          maxLength: 500
+          description: The company's description.
+          example: Lorem ipsum
+        telephone:
+          type: string
+          format: numeric
+          description: The company's telephone number.
+          example: '210 8320438'
+        email:
+          type: string
+          format: email
+          description: The company's email address.
+          example: contact@business.com
+        logo:
+          type: string
+          format: uri
+          minLength: 3
+          maxLength: 500
+          description: The link to the company's logo.
+          example: 'https://s3.amazonaws.com/128.jpg'
+        location:
+          type: object
+          description: The map co-ordinates of the company
+          properties:
+            latitude:
+              type: string
+              format: float
+              maxLength: 90
+              description: The latitute co-ordinate
+              example: '78.98870000'
+            longitude:
+              type: string
+              format: float
+              maxLength: 180
+              description: The longitude co-ordinate
+              example: '-27.58350000'
+        address:
+          type: object
+          description: The address of the company
+          properties:
+            street:
+              type: string
+              pattern: '^[a-zA-Z ]+$'
+              minLength: 3
+              maxLength: 100
+              description: The street name of the address
+              example: 'Michail Koraka'
+            number:
+              type: integer
+              format: numeric
+              minLength: 3
+              maxLength: 18
+              description: The street number of the address
+              example: 10445
+            city:
+              type: string
+              format: '^[a-zA-Z ]+$'
+              minLength: 3
+              maxLength: 100
+              description: The city where the company is located
+              example: 'Athens'
+            country:
+              type: string
+              format: '^[a-zA-Z ]+$'
+              minLength: 3
+              maxLength: 100
+              description: The country where the company is located
+              example: 'Greece'
+        isActive:
+          type: boolean
+          description: A flag defining if the company is activated or not.
+          example: false
+      required:
+      - name
+      - email
+      - street
+      - number
+      - city
+      - country
+
+  headers:
+    X-RateLimit-Limit:
+      schema:
+        type: integer
+      description: Request limit per specific hour
+    X-RateLimit-Rate:
+      schema:
+        type: number
+      description: Rate of the requests
+    X-RateLimit-Remaining:
+      schema:
+        type: integer
+      description: Remaining request of the 'Limit'
+    Content-Location:
+      schema:
+        type: string
+      description: The link to the newly created company
+    Link:
+      schema:
+        type: string
+      description: 'A link for the next, previous, last and first results set'
+
+  responses:
+    UNAUTHORIZED:
+      description: Not a valid access token
+    UNPROCESSABLE_ENTITY:
+      description: Not a valid company object
+    BAD_REQUEST:
+      description: The request is not valid
+    NOT_FOUND:
+      description: Company was not found
+    FORBIDDEN:
+      description: Not allowed to access entity
+    JWT:
+      description: An object containing a valid JWT
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+tags:
+- name: Companies
+  description: Everything about a Company
+  externalDocs:
+    url: http://docs.my-api.com/pet-operations.htm
